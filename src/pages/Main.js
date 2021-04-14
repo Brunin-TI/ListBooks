@@ -19,16 +19,26 @@ const Main = ({ navigation }) => {
     });
   }, []);
 
+  const onNewBook = () => {
+    navigation.navigate("Book");
+  };
+
+  const onBookEdit = (bookId) => {
+    const book = books.find((item) => item.id === bookId);
+    navigation.navigate("Book", { book: book, isEdit: true });
+  };
+
+  const onBookDelete = async (bookId) => {
+    const newBooks = books.filter((item) => item.id !== bookId);
+    await AsyncStorage.setItem("books", newBooks);
+    setBooks(newBooks);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.toolBox}>
         <Text style={styles.title}>Lista de Livros</Text>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("Book");
-          }}
-          style={styles.toolBoxButton}
-        >
+        <TouchableOpacity onPress={onNewBook} style={styles.toolBoxButton}>
           <Icon name="add" size={18} color="#000" />
         </TouchableOpacity>
       </View>
@@ -36,12 +46,23 @@ const Main = ({ navigation }) => {
         data={books}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View>
+          <View style={styles.itemsContainer}>
             <TouchableOpacity style={styles.itemButton}>
               <Text style={styles.itemText}>{item.title}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.editButton}>
-              <Icon name="create" size={18} color="#2ecc71" />
+            <TouchableOpacity
+              onPress={() => {
+                onBookEdit(item.id);
+              }}
+              style={styles.editButton}
+            >
+              <Icon name="create" size={22} color="#2ecc71" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => onBookDelete(item.id)}
+            >
+              <Icon name="trash-outline" size={22} color="#e74c3c" />
             </TouchableOpacity>
           </View>
         )}
@@ -76,7 +97,13 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 18,
   },
-  itemButton: {},
+  itemsContainer: {
+    flexDirection: "row",
+  },
+  itemButton: {
+    flex: 1,
+  },
   editButton: {},
+  deleteButton: {},
 });
 export default Main;
