@@ -7,6 +7,7 @@ import {
   View,
   StyleSheet,
 } from "react-native";
+import Constants from "expo-constants";
 import Icon from "react-native-vector-icons/Ionicons";
 
 const Main = ({ navigation }) => {
@@ -30,7 +31,18 @@ const Main = ({ navigation }) => {
 
   const onBookDelete = async (bookId) => {
     const newBooks = books.filter((item) => item.id !== bookId);
-    await AsyncStorage.setItem("books", newBooks);
+    await AsyncStorage.setItem("books", JSON.stringify(newBooks));
+    setBooks(newBooks);
+  };
+
+  const onBookRead = async (bookId) => {
+    const newBooks = books.map((item) => {
+      if (item.id === bookId) {
+        item.read = !item.read;
+      }
+      return item;
+    });
+    await AsyncStorage.setItem("books", JSON.stringify(newBooks));
     setBooks(newBooks);
   };
 
@@ -47,8 +59,13 @@ const Main = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.itemsContainer}>
-            <TouchableOpacity style={styles.itemButton}>
-              <Text style={styles.itemText}>{item.title}</Text>
+            <TouchableOpacity
+              onPress={() => onBookRead(item.id)}
+              style={styles.itemButton}
+            >
+              <Text style={[styles.itemText, item.read ? styles.itemRead : ""]}>
+                {item.title}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
@@ -75,11 +92,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 5,
+    paddingTop: Constants.statusBarHeight,
   },
   toolBox: {
     flexDirection: "row",
     marginBottom: 5,
-    marginTop: 20,
   },
   title: {
     flex: 1,
@@ -102,6 +119,10 @@ const styles = StyleSheet.create({
   },
   itemButton: {
     flex: 1,
+  },
+  itemRead: {
+    textDecorationLine: "line-through",
+    color: "#95a5a6",
   },
   editButton: {},
   deleteButton: {},

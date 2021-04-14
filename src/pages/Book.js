@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Constants from "expo-constants";
 import Icon from "react-native-vector-icons/Ionicons";
 const Book = ({ navigation }) => {
   const book = navigation.getParam("book", {
@@ -53,9 +54,6 @@ const Book = ({ navigation }) => {
           }
           return item;
         });
-
-        console.log("books", books);
-        console.log("newBooks", newBooks);
 
         await AsyncStorage.setItem("books", JSON.stringify(newBooks));
       } else {
@@ -106,7 +104,7 @@ const Book = ({ navigation }) => {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[styles.saveButton, !isValid() ? styles.saveButtonInvalid : ""]}
+        style={[styles.saveButton, isValid() ? "" : styles.saveButtonInvalid]}
         onPress={onSave}
       >
         <Text style={styles.saveButtonText}>
@@ -129,8 +127,8 @@ const Book = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 20,
     padding: 10,
+    paddingTop: Constants.statusBarHeight,
   },
   pageTitle: {
     textAlign: "center",
