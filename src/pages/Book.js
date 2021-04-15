@@ -6,9 +6,12 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Modal,
 } from "react-native";
 import Constants from "expo-constants";
 import Icon from "react-native-vector-icons/Ionicons";
+import Camera from "../components/Camera";
+import Photo from "../components/Photo";
 const Book = ({ navigation }) => {
   const book = navigation.getParam("book", {
     title: "",
@@ -24,6 +27,7 @@ const Book = ({ navigation }) => {
   const [description, setDescription] = useState(book.description);
   const [read, setRead] = useState(book.read);
   const [photo, setPhoto] = useState(book.photo);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
     AsyncStorage.getItem("books").then((data) => {
@@ -76,6 +80,8 @@ const Book = ({ navigation }) => {
       console.log("Inválido!");
     }
   };
+  const onCloseModal = () => setIsModalVisible(false);
+  const onChangePhoto = (newPhoto) => setPhoto(newPhoto);
 
   return (
     <View style={styles.container}>
@@ -99,7 +105,12 @@ const Book = ({ navigation }) => {
           setDescription(text);
         }}
       />
-      <TouchableOpacity style={styles.cameraButton}>
+      <TouchableOpacity
+        style={styles.cameraButton}
+        onPress={() => {
+          setIsModalVisible(true);
+        }}
+      >
         <Icon name="camera" size={28} />
       </TouchableOpacity>
 
@@ -120,6 +131,17 @@ const Book = ({ navigation }) => {
       >
         <Text style={styles.cancelButtonText}>Cancelar</Text>
       </TouchableOpacity>
+      <Modal animationType="slide" visible={isModalVisible}>
+        {photo ? (
+          <Photo
+            photo={photo}
+            onDeletePhoto={onChangePhoto}
+            onClosePicture={onCloseModal}
+          />
+        ) : (
+          <Camera onCloseCamera={onCloseModal} onTakePicture={onChangePhoto} />
+        )}
+      </Modal>
     </View>
   );
 };
